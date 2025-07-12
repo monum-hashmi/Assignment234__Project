@@ -1,0 +1,42 @@
+{% extends 'resume_base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>My Personal Information</h3>
+        <a href="{% url 'personal_information_create' %}" class="btn btn-primary">Add New</a>
+    </div>
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Location</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for info in personal_information_list %}
+                    <tr>
+                        <td>{{ info.full_name }}</td>
+                        <td>{{ info.email }}</td>
+                        <td>{{ info.phone|default:"-" }}</td>
+                        <td>{{ info.city|default:"" }}{% if info.city and info.country %}, {% endif %}{{ info.country|default:"" }}</td>
+                        <td>
+                            <a href="{% url 'personal_information_detail' info.pk %}" class="btn btn-sm btn-info">View</a>
+                            <a href="{% url 'personal_information_update' info.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{% url 'personal_information_delete' info.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5">No personal information found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

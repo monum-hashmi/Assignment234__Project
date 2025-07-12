@@ -342,3 +342,58 @@ class Language(models.Model):
 
     def get_proficiency_display(self):
         return self.proficiency
+
+
+class PersonalInformation(models.Model):
+    """Personal information for resume"""
+    resume = models.ForeignKey(
+        Resume,
+        on_delete=models.CASCADE,
+        related_name='personal_information'
+    )
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True)
+    address = models.TextField(blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    linkedin_url = models.URLField(blank=True)
+    github_url = models.URLField(blank=True)
+    portfolio_url = models.URLField(blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    nationality = models.CharField(max_length=100, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True)
+    is_visible = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Personal Information'
+        verbose_name_plural = 'Personal Information'
+        unique_together = ('resume',)
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} - {self.resume.title}"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def full_address(self):
+        address_parts = []
+        if self.address:
+            address_parts.append(self.address)
+        if self.city:
+            address_parts.append(self.city)
+        if self.state:
+            address_parts.append(self.state)
+        if self.postal_code:
+            address_parts.append(self.postal_code)
+        if self.country:
+            address_parts.append(self.country)
+        return ', '.join(address_parts) if address_parts else ''
