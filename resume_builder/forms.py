@@ -28,7 +28,7 @@ class PersonalInformationForm(forms.ModelForm):
             'resume', 'first_name', 'last_name', 'email', 'phone', 
             'address', 'city', 'state', 'country', 'postal_code',
             'linkedin_url', 'github_url', 'portfolio_url', 
-            'date_of_birth', 'nationality', 'profile_picture', 'is_visible'
+            'date_of_birth', 'nationality', 'is_visible'
         ]
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),

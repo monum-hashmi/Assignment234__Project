@@ -2,9 +2,17 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.shortcuts import get_object_or_404
+from xhtml2pdf import pisa
+from docx import Document
+from docx.shared import Inches
+from io import BytesIO
+import os
 from resume_builder.models import (
     WorkExperience, Education, Project, Certification, 
-    Award, Language, TechnicalSkill, PersonalInformation
+    Award, Language, TechnicalSkill, PersonalInformation, Resume
 )
 from resume_builder.forms import (
     WorkExperienceForm, EducationForm, ProjectForm, CertificationForm,
@@ -394,3 +402,208 @@ class TechnicalSkillDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailVi
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
+
+
+class ResumeListView(LoginRequiredMixin, ListView):
+    model = Resume
+    template_name = 'resume_builder/resume_list.html'
+    context_object_name = 'resumes'
+
+    def get_queryset(self):
+        return Resume.objects.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_resume'] = Resume.objects.filter(user=self.request.user).first()
+        return context
+
+
+class ResumeDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Resume
+    template_name = 'resume_builder/resume_detail.html'
+    context_object_name = 'resume'
+
+    def test_func(self):
+        return self.get_object().user == self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        resume = self.get_object()
+        
+        # Get all resume data
+        context.update({
+            'personal_info': PersonalInformation.objects.filter(resume=resume).first(),
+            'work_experiences': WorkExperience.objects.filter(resume=resume).order_by('-end_date'),
+            'educations': Education.objects.filter(resume=resume).order_by('-end_date'),
+            'projects': Project.objects.filter(resume=resume).order_by('-start_date'),
+            'certifications': Certification.objects.filter(resume=resume).order_by('-issue_date'),
+            'awards': Award.objects.filter(resume=resume).order_by('-date_received'),
+            'languages': Language.objects.filter(resume=resume),
+            'technical_skills': TechnicalSkill.objects.filter(resume=resume),
+        })
+        
+        return context
+
+
+class ResumeDownloadPDFView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Resume
+    template_name = 'resume_builder/resume_pdf_template.html'
+    context_object_name = 'resume'
+
+    def test_func(self):
+        return self.get_object().user == self.request.user
+
+    def get(self, request, *args, **kwargs):
+        resume = self.get_object()
+        
+        # Get all resume data
+        context = {
+            'resume': resume,
+            'personal_info': PersonalInformation.objects.filter(resume=resume).first(),
+            'work_experiences': WorkExperience.objects.filter(resume=resume).order_by('-end_date'),
+            'educations': Education.objects.filter(resume=resume).order_by('-end_date'),
+            'projects': Project.objects.filter(resume=resume).order_by('-start_date'),
+            'certifications': Certification.objects.filter(resume=resume).order_by('-issue_date'),
+            'awards': Award.objects.filter(resume=resume).order_by('-date_received'),
+            'languages': Language.objects.filter(resume=resume),
+            'technical_skills': TechnicalSkill.objects.filter(resume=resume),
+        }
+        
+        # Render the template
+        html_string = render_to_string(self.template_name, context)
+        
+        # Create PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{resume.title}_resume.pdf"'
+        
+        # Generate PDF
+        pisa_status = pisa.CreatePDF(html_string, dest=response)
+        
+        if pisa_status.err:
+            return HttpResponse('PDF generation failed', status=500)
+        
+        return response
+
+
+class ResumeDownloadDOCXView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Resume
+    context_object_name = 'resume'
+
+    def test_func(self):
+        return self.get_object().user == self.request.user
+
+    def get(self, request, *args, **kwargs):
+        resume = self.get_object()
+        
+        # Create a new Document
+        doc = Document()
+        
+        # Add title
+        title = doc.add_heading(resume.title, 0)
+        title.alignment = 1  # Center alignment
+        
+        # Get all resume data
+        personal_info = PersonalInformation.objects.filter(resume=resume).first()
+        work_experiences = WorkExperience.objects.filter(resume=resume).order_by('-end_date')
+        educations = Education.objects.filter(resume=resume).order_by('-end_date')
+        projects = Project.objects.filter(resume=resume).order_by('-start_date')
+        certifications = Certification.objects.filter(resume=resume).order_by('-issue_date')
+        awards = Award.objects.filter(resume=resume).order_by('-date_received')
+        languages = Language.objects.filter(resume=resume)
+        technical_skills = TechnicalSkill.objects.filter(resume=resume)
+        
+        # Personal Information
+        if personal_info:
+            doc.add_heading('Personal Information', level=1)
+            p = doc.add_paragraph()
+            p.add_run(f'Name: {personal_info.full_name}\n')
+            p.add_run(f'Email: {personal_info.email}\n')
+            if personal_info.phone:
+                p.add_run(f'Phone: {personal_info.phone}\n')
+            if personal_info.address:
+                p.add_run(f'Address: {personal_info.address}\n')
+            if personal_info.linkedin_url:
+                p.add_run(f'LinkedIn: {personal_info.linkedin_url}\n')
+            if personal_info.github_url:
+                p.add_run(f'GitHub: {personal_info.github_url}\n')
+        
+        # Summary
+        if resume.summary:
+            doc.add_heading('Summary', level=1)
+            doc.add_paragraph(resume.summary)
+        
+        # Work Experience
+        if work_experiences:
+            doc.add_heading('Work Experience', level=1)
+            for exp in work_experiences:
+                p = doc.add_paragraph()
+                p.add_run(f'{exp.job_title} at {exp.company_name}').bold = True
+                p.add_run(f' ({exp.start_date} - {exp.end_date or "Present"})')
+                doc.add_paragraph(exp.description)
+        
+        # Education
+        if educations:
+            doc.add_heading('Education', level=1)
+            for edu in educations:
+                p = doc.add_paragraph()
+                p.add_run(f'{edu.degree} in {edu.field_of_study}').bold = True
+                p.add_run(f' - {edu.institution_name} ({edu.start_date} - {edu.end_date or "Present"})')
+                if edu.gpa:
+                    p.add_run(f' GPA: {edu.gpa}')
+        
+        # Technical Skills
+        if technical_skills:
+            doc.add_heading('Technical Skills', level=1)
+            for skill in technical_skills:
+                p = doc.add_paragraph()
+                p.add_run(f'{skill.skill_name}').bold = True
+                p.add_run(f' - {skill.proficiency_level}')
+        
+        # Projects
+        if projects:
+            doc.add_heading('Projects', level=1)
+            for project in projects:
+                p = doc.add_paragraph()
+                p.add_run(f'{project.title}').bold = True
+                p.add_run(f' ({project.start_date} - {project.end_date or "Present"})')
+                doc.add_paragraph(project.description)
+                if project.url:
+                    doc.add_paragraph(f'URL: {project.url}')
+        
+        # Certifications
+        if certifications:
+            doc.add_heading('Certifications', level=1)
+            for cert in certifications:
+                p = doc.add_paragraph()
+                p.add_run(f'{cert.name}').bold = True
+                p.add_run(f' - {cert.issuing_organization} ({cert.issue_date})')
+                if cert.expiry_date:
+                    p.add_run(f' - Expires: {cert.expiry_date}')
+        
+        # Awards
+        if awards:
+            doc.add_heading('Awards', level=1)
+            for award in awards:
+                p = doc.add_paragraph()
+                p.add_run(f'{award.name}').bold = True
+                p.add_run(f' - {award.issuing_organization} ({award.date_received})')
+                doc.add_paragraph(award.description)
+        
+        # Languages
+        if languages:
+            doc.add_heading('Languages', level=1)
+            for lang in languages:
+                p = doc.add_paragraph()
+                p.add_run(f'{lang.language_name}').bold = True
+                p.add_run(f' - {lang.proficiency_level}')
+        
+        # Save to BytesIO
+        buffer = BytesIO()
+        doc.save(buffer)
+        buffer.seek(0)
+        
+        # Create response
+        response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = f'attachment; filename="{resume.title}_resume.docx"'
+        
+        return response

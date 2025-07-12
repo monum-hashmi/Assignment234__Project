@@ -16,10 +16,17 @@ from .views import (
     LanguageListView, LanguageCreateView, LanguageUpdateView,
     LanguageDeleteView, LanguageDetailView,
     TechnicalSkillListView, TechnicalSkillCreateView, TechnicalSkillUpdateView,
-    TechnicalSkillDeleteView, TechnicalSkillDetailView
+    TechnicalSkillDeleteView, TechnicalSkillDetailView,
+    ResumeListView, ResumeDetailView, ResumeDownloadPDFView, ResumeDownloadDOCXView
 )
 
 urlpatterns = [
+    # Resume URLs
+    path('resume/', ResumeListView.as_view(), name='resume_list'),
+    path('resume/<int:pk>/', ResumeDetailView.as_view(), name='resume_detail'),
+    path('resume/<int:pk>/download/pdf/', ResumeDownloadPDFView.as_view(), name='resume_download_pdf'),
+    path('resume/<int:pk>/download/docx/', ResumeDownloadDOCXView.as_view(), name='resume_download_docx'),
+    
     # Personal Information URLs
     path('personal-information/', PersonalInformationListView.as_view(), name='personal_information_list'),
     path('personal-information/add/', PersonalInformationCreateView.as_view(), name='personal_information_create'),
