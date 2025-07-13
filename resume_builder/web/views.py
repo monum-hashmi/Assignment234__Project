@@ -2,11 +2,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-<<<<<<< HEAD
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, TemplateView
 from django.shortcuts import get_object_or_404
-=======
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
@@ -15,15 +12,9 @@ from docx import Document
 from docx.shared import Inches
 from io import BytesIO
 import os
-<<<<<<< HEAD
->>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
-from resume_builder.models import (
-    WorkExperience, Education, Project, Certification, 
-=======
 from resume_builder.models import (
     WorkExperience, Education, Project, Certification, 
     Award, Language, TechnicalSkill, PersonalInformation, Resume
->>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
 )
 from resume_builder.forms import (
     WorkExperienceForm, EducationForm, ProjectForm, CertificationForm,
@@ -408,11 +399,9 @@ class TechnicalSkillDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailVi
     context_object_name = 'technical_skill'
 
     def test_func(self):
-<<<<<<< HEAD
-        return self.get_object().resume.user == self.request.user        return self.get_object().resume.user == self.request.user
+        return self.get_object().resume.user == self.request.user
 
 
-<<<<<<< HEAD
 # Resume Preview Views
 class ResumePreviewView(LoginRequiredMixin, TemplateView):
     """Base class for resume preview views"""
@@ -432,12 +421,29 @@ class ResumePreviewView(LoginRequiredMixin, TemplateView):
         context['certifications'] = resume.certifications.all()
         context['awards'] = resume.awards.all()
         context['languages'] = resume.languages.all()
-=======
-=======
-        return self.get_object().resume.user == self.request.user
+        return context
 
 
->>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
+class ClassicResumePreviewView(ResumePreviewView):
+    template_name = 'resume_builder/preview/template_classic.html'
+
+
+class ModernResumePreviewView(ResumePreviewView):
+    template_name = 'resume_builder/preview/template_modern.html'
+
+
+class CreativeResumePreviewView(ResumePreviewView):
+    template_name = 'resume_builder/preview/template_creative.html'
+
+
+class TechnicalResumePreviewView(ResumePreviewView):
+    template_name = 'resume_builder/preview/template_technical.html'
+
+
+class MinimalResumePreviewView(ResumePreviewView):
+    template_name = 'resume_builder/preview/template_minimal.html'
+
+
 class ResumeListView(LoginRequiredMixin, ListView):
     model = Resume
     template_name = 'resume_builder/resume_list.html'
@@ -475,42 +481,10 @@ class ResumeDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
             'languages': Language.objects.filter(resume=resume),
             'technical_skills': TechnicalSkill.objects.filter(resume=resume),
         })
-<<<<<<< HEAD
->>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
-=======
->>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
         
         return context
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-class TemplateSelectorView(LoginRequiredMixin, TemplateView):
-    """View to showcase all available resume templates"""
-    template_name = 'resume_builder/preview/template_selector.html'
-
-
-class ClassicResumePreviewView(ResumePreviewView):
-    template_name = 'resume_builder/preview/template_classic.html'
-
-
-class ModernResumePreviewView(ResumePreviewView):
-    template_name = 'resume_builder/preview/template_modern.html'
-
-
-class CreativeResumePreviewView(ResumePreviewView):
-    template_name = 'resume_builder/preview/template_creative.html'
-
-
-class TechnicalResumePreviewView(ResumePreviewView):
-    template_name = 'resume_builder/preview/template_technical.html'
-
-
-class MinimalResumePreviewView(ResumePreviewView):
-    template_name = 'resume_builder/preview/template_minimal.html'
-=======
-=======
->>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
 class ResumeDownloadPDFView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Resume
     template_name = 'resume_builder/resume_pdf_template.html'
@@ -672,9 +646,4 @@ class ResumeDownloadDOCXView(LoginRequiredMixin, UserPassesTestMixin, DetailView
         response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
         response['Content-Disposition'] = f'attachment; filename="{resume.title}_resume.docx"'
         
-<<<<<<< HEAD
         return response
->>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
-=======
-        return response
->>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3

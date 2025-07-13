@@ -1,143 +1,38 @@
 {% extends 'resume_base.html' %}
-{% load static %}
 
-{% block title %}
-Personal Information Detail—Resume Builder
-{% endblock %}
+{% block title %}Personal Information Detail–Resume Builder{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="card shadow">
-        <div class="card-header bg-info text-white">
-            <h4>Personal Information Details</h4>
-        </div>
+    <h2>Personal Information</h2>
+    <div class="card mb-4">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
-                    <h5>Basic Information</h5>
-                    <table class="table table-borderless">
-                        <tr>
-                            <td><strong>Full Name:</strong></td>
-                            <td>{{ personal_information.full_name }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Email:</strong></td>
-                            <td>{{ personal_information.email }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Phone:</strong></td>
-                            <td>{{ personal_information.phone|default:"Not provided" }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Date of Birth:</strong></td>
-                            <td>{{ personal_information.date_of_birth|default:"Not provided" }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Nationality:</strong></td>
-                            <td>{{ personal_information.nationality|default:"Not provided" }}</td>
-                        </tr>
-                    </table>
+                    <p><strong>Full Name:</strong> {{ personal_information.full_name }}</p>
+                    <p><strong>Email:</strong> {{ personal_information.email }}</p>
+                    <p><strong>Phone:</strong> {{ personal_information.phone }}</p>
+                    <p><strong>Address:</strong> {{ personal_information.address }}</p>
+                    <p><strong>LinkedIn:</strong> <a href="{{ personal_information.linkedin_url }}" target="_blank">{{ personal_information.linkedin_url }}</a></p>
+                    <p><strong>GitHub:</strong> <a href="{{ personal_information.github_url }}" target="_blank">{{ personal_information.github_url }}</a></p>
+                    <p><strong>Portfolio:</strong> <a href="{{ personal_information.portfolio_url }}" target="_blank">{{ personal_information.portfolio_url }}</a></p>
+                    <p><strong>Date of Birth:</strong> {{ personal_information.date_of_birth }}</p>
+                    <p><strong>Nationality:</strong> {{ personal_information.nationality }}</p>
+                    <p><strong>Visible on Resume:</strong> {{ personal_information.is_visible|yesno:"Yes,No" }}</p>
                 </div>
                 <div class="col-md-6">
-                    <h5>Address Information</h5>
-                    <table class="table table-borderless">
-                        <tr>
-                            <td><strong>Address:</strong></td>
-                            <td>{{ personal_information.address|default:"Not provided" }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>City:</strong></td>
-                            <td>{{ personal_information.city|default:"Not provided" }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>State:</strong></td>
-                            <td>{{ personal_information.state|default:"Not provided" }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Country:</strong></td>
-                            <td>{{ personal_information.country|default:"Not provided" }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Postal Code:</strong></td>
-                            <td>{{ personal_information.postal_code|default:"Not provided" }}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="row mt-4">
-                <div class="col-12">
-                    <h5>Online Profiles</h5>
-                    <table class="table table-borderless">
-                        <tr>
-                            <td><strong>LinkedIn:</strong></td>
-                            <td>
-                                {% if personal_information.linkedin_url %}
-                                    <a href="{{ personal_information.linkedin_url }}" target="_blank">{{ personal_information.linkedin_url }}</a>
-                                {% else %}
-                                    Not provided
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>GitHub:</strong></td>
-                            <td>
-                                {% if personal_information.github_url %}
-                                    <a href="{{ personal_information.github_url }}" target="_blank">{{ personal_information.github_url }}</a>
-                                {% else %}
-                                    Not provided
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Portfolio:</strong></td>
-                            <td>
-                                {% if personal_information.portfolio_url %}
-                                    <a href="{{ personal_information.portfolio_url }}" target="_blank">{{ personal_information.portfolio_url }}</a>
-                                {% else %}
-                                    Not provided
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-
-<<<<<<< HEAD
-            {% if personal_information.profile_picture %}
-            <div class="row mt-4">
-                <div class="col-12">
-                    <h5>Profile Picture</h5>
-                    <img src="{{ personal_information.profile_picture.url }}" alt="Profile Picture" class="img-thumbnail" style="max-width: 200px;">
-                </div>
-            </div>
-            {% endif %}
-<<<<<<< HEAD
-=======
-=======
-
->>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
-
-
->>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
-            <div class="mt-4">
-                <a href="{% url 'personal_information_update' personal_information.pk %}" class="btn btn-warning">Edit</a>
-                <a href="{% url 'personal_information_list' %}" class="btn btn-secondary">Back to List</a>
-                {% if personal_information.resume %}
-                <div class="mt-3">
-                    <h6><i class="bi bi-download"></i> Download Resume</h6>
-                    <div class="d-flex gap-2">
-                        <a href="{% url 'resume_download_pdf' personal_information.resume.pk %}" class="btn btn-danger btn-sm">
-                            <i class="bi bi-file-pdf"></i> Download as PDF
-                        </a>
-                        <a href="{% url 'resume_download_docx' personal_information.resume.pk %}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-file-word"></i> Download as DOCX
-                        </a>
+                    {% if personal_information.profile_picture %}
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <img src="{{ personal_information.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded" style="max-width: 200px;">
+                        </div>
                     </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
+    <a href="{% url 'personal_information_update' personal_information.pk %}" class="btn btn-primary">Edit</a>
+    <a href="{% url 'personal_information_list' %}" class="btn btn-secondary">Back to List</a>
 </div>
 {% endblock %} 

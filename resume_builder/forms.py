@@ -25,12 +25,10 @@ class PersonalInformationForm(forms.ModelForm):
     class Meta:
         model = PersonalInformation
         fields = [
-            'resume', 'first_name', 'last_name', 'email', 'phone', 
             'first_name', 'last_name', 'email', 'phone',
             'address', 'city', 'state', 'country', 'postal_code',
 <<<<<<< HEAD
             'linkedin_url', 'github_url', 'portfolio_url',
-=======
             'linkedin_url', 'github_url', 'portfolio_url', 
 <<<<<<< HEAD
             'date_of_birth', 'nationality', 'profile_picture', 'is_visible'
