@@ -1,0 +1,292 @@
+{% extends 'resume_base.html' %}
+
+{% block title %}Resume Templates{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Choose Your Resume Template</h1>
+            <p class="lead mb-5">Select from our collection of professional resume templates designed for different industries and styles.</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="template-card">
+                <div class="template-preview classic-preview">
+                    <div class="preview-header">
+                        <h3>John Doe</h3>
+                        <p>Software Developer</p>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-section">
+                            <h4>Experience</h4>
+                            <p>Senior Developer at Tech Corp</p>
+                        </div>
+                        <div class="preview-section">
+                            <h4>Skills</h4>
+                            <p>Python, JavaScript, React</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h4>Classic Template</h4>
+                    <p>Traditional professional layout with clean typography and structured sections.</p>
+                    {% if request.user.resume_set.first %}
+                    <a href="{% url 'resume_preview_classic' resume_id=request.user.resume_set.first.id %}" class="btn btn-primary">Preview Classic</a>
+                    {% else %}
+                    <button class="btn btn-secondary" disabled>Create Resume First</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="template-card">
+                <div class="template-preview modern-preview">
+                    <div class="preview-header">
+                        <h3>Jane Smith</h3>
+                        <p>Full Stack Developer</p>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-section">
+                            <h4>Experience</h4>
+                            <p>Lead Developer at Startup</p>
+                        </div>
+                        <div class="preview-section">
+                            <h4>Skills</h4>
+                            <p>Node.js, Vue.js, AWS</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h4>Modern Template</h4>
+                    <p>Contemporary design with modern styling and visual hierarchy.</p>
+                    {% if request.user.resume_set.first %}
+                    <a href="{% url 'resume_preview_modern' resume_id=request.user.resume_set.first.id %}" class="btn btn-primary">Preview Modern</a>
+                    {% else %}
+                    <button class="btn btn-secondary" disabled>Create Resume First</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="template-card">
+                <div class="template-preview creative-preview">
+                    <div class="preview-header">
+                        <h3>Alex Johnson</h3>
+                        <p>Creative Developer</p>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-section">
+                            <h4>Experience</h4>
+                            <p>UI/UX Developer at Design Studio</p>
+                        </div>
+                        <div class="preview-section">
+                            <h4>Skills</h4>
+                            <p>Figma, CSS, Animation</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h4>Creative Template</h4>
+                    <p>Bold and innovative design with gradients and visual elements.</p>
+                    {% if request.user.resume_set.first %}
+                    <a href="{% url 'resume_preview_creative' resume_id=request.user.resume_set.first.id %}" class="btn btn-primary">Preview Creative</a>
+                    {% else %}
+                    <button class="btn btn-secondary" disabled>Create Resume First</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="template-card">
+                <div class="template-preview technical-preview">
+                    <div class="preview-header">
+                        <h3>Mike Chen</h3>
+                        <p>Backend Engineer</p>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-section">
+                            <h4>Experience</h4>
+                            <p>Senior Engineer at Tech Giant</p>
+                        </div>
+                        <div class="preview-section">
+                            <h4>Skills</h4>
+                            <p>Java, Spring, Microservices</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h4>Technical Template</h4>
+                    <p>Developer-focused design with code-like styling and technical emphasis.</p>
+                    {% if request.user.resume_set.first %}
+                    <a href="{% url 'resume_preview_technical' resume_id=request.user.resume_set.first.id %}" class="btn btn-primary">Preview Technical</a>
+                    {% else %}
+                    <button class="btn btn-secondary" disabled>Create Resume First</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="template-card">
+                <div class="template-preview minimal-preview">
+                    <div class="preview-header">
+                        <h3>Sarah Wilson</h3>
+                        <p>Product Manager</p>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-section">
+                            <h4>Experience</h4>
+                            <p>Product Lead at SaaS Company</p>
+                        </div>
+                        <div class="preview-section">
+                            <h4>Skills</h4>
+                            <p>Agile, Analytics, Strategy</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="template-info">
+                    <h4>Minimal Template</h4>
+                    <p>Clean and simple design focusing on content and readability.</p>
+                    {% if request.user.resume_set.first %}
+                    <a href="{% url 'resume_preview_minimal' resume_id=request.user.resume_set.first.id %}" class="btn btn-primary">Preview Minimal</a>
+                    {% else %}
+                    <button class="btn btn-secondary" disabled>Create Resume First</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.template-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+.template-preview {
+    height: 200px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.classic-preview {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 3px solid #2c3e50;
+}
+
+.modern-preview {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.creative-preview {
+    background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+    color: white;
+}
+
+.technical-preview {
+    background: #1e1e1e;
+    color: #e6e6e6;
+    font-family: 'Courier New', monospace;
+}
+
+.minimal-preview {
+    background: white;
+    border: 2px solid #e5e5e5;
+}
+
+.preview-header h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 5px 0;
+}
+
+.preview-header p {
+    font-size: 14px;
+    margin: 0;
+    opacity: 0.8;
+}
+
+.preview-content {
+    margin-top: 15px;
+}
+
+.preview-section {
+    margin-bottom: 10px;
+}
+
+.preview-section h4 {
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0 0 3px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.preview-section p {
+    font-size: 11px;
+    margin: 0;
+    opacity: 0.8;
+}
+
+.template-info {
+    padding: 20px;
+}
+
+.template-info h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+}
+
+.template-info p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.btn-primary {
+    background: #007bff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .template-preview {
+        height: 150px;
+    }
+    
+    .template-info {
+        padding: 15px;
+    }
+}
+</style>
+{% endblock %} 

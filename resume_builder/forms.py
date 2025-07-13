@@ -26,9 +26,18 @@ class PersonalInformationForm(forms.ModelForm):
         model = PersonalInformation
         fields = [
             'resume', 'first_name', 'last_name', 'email', 'phone', 
+            'first_name', 'last_name', 'email', 'phone',
             'address', 'city', 'state', 'country', 'postal_code',
+<<<<<<< HEAD
+            'linkedin_url', 'github_url', 'portfolio_url',
+=======
             'linkedin_url', 'github_url', 'portfolio_url', 
+<<<<<<< HEAD
             'date_of_birth', 'nationality', 'profile_picture', 'is_visible'
+>>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
+=======
+>>>>>>> 18af67a6d1c288a9cb2d04e842174f15448d56f3
+            'date_of_birth', 'nationality', 'is_visible'
         ]
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
