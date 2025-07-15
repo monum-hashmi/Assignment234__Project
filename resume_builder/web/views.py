@@ -18,7 +18,7 @@ from resume_builder.models import (
 )
 from resume_builder.forms import (
     WorkExperienceForm, EducationForm, ProjectForm, CertificationForm,
-    AwardForm, LanguageForm, TechnicalSkillForm, PersonalInformationForm
+    AwardForm, LanguageForm, TechnicalSkillForm, PersonalInformationForm, ResumeForm
 )
 
 # Personal Information CRUD Views
@@ -34,18 +34,25 @@ class PersonalInformationCreateView(LoginRequiredMixin, CreateView):
     model = PersonalInformation
     form_class = PersonalInformationForm
     template_name = 'resume_builder/personal_information/personal_information_form.html'
-    success_url = reverse_lazy('personal_information_list')
+    success_url = reverse_lazy('resume_builder_web:personal_information_list')
 
     def form_valid(self, form):
+        # Assign the first resume belonging to the user
+        resume = Resume.objects.filter(user=self.request.user).first()
+        if not resume:
+            form.add_error(None, 'You must create a resume before adding personal information.')
             return self.form_invalid(form)
-        form.instance.resume = user_resumes.first()
-        return super().form_valid(form)
+        form.instance.resume = resume
+        response = super().form_valid(form)
+        from django.contrib import messages
+        messages.success(self.request, 'Personal information saved successfully!')
+        return response
 
 class PersonalInformationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = PersonalInformation
     form_class = PersonalInformationForm
     template_name = 'resume_builder/personal_information/personal_information_form.html'
-    success_url = reverse_lazy('personal_information_list')
+    success_url = reverse_lazy('resume_builder_web:personal_information_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -53,7 +60,7 @@ class PersonalInformationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Upd
 class PersonalInformationDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = PersonalInformation
     template_name = 'resume_builder/personal_information/personal_information_confirm_delete.html'
-    success_url = reverse_lazy('personal_information_list')
+    success_url = reverse_lazy('resume_builder_web:personal_information_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -78,7 +85,7 @@ class WorkExperienceCreateView(LoginRequiredMixin, CreateView):
     model = WorkExperience
     form_class = WorkExperienceForm
     template_name = 'resume_builder/work_experience/work_experience_form.html'
-    success_url = reverse_lazy('work_experience_list')
+    success_url = reverse_lazy('resume_builder_web:work_experience_list')
 
     def form_valid(self, form):
         # Ensure the resume belongs to the user
@@ -92,7 +99,7 @@ class WorkExperienceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVi
     model = WorkExperience
     form_class = WorkExperienceForm
     template_name = 'resume_builder/work_experience/work_experience_form.html'
-    success_url = reverse_lazy('work_experience_list')
+    success_url = reverse_lazy('resume_builder_web:work_experience_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -100,7 +107,7 @@ class WorkExperienceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVi
 class WorkExperienceDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = WorkExperience
     template_name = 'resume_builder/work_experience/work_experience_confirm_delete.html'
-    success_url = reverse_lazy('work_experience_list')
+    success_url = reverse_lazy('resume_builder_web:work_experience_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -127,7 +134,7 @@ class EducationCreateView(LoginRequiredMixin, CreateView):
     model = Education
     form_class = EducationForm
     template_name = 'resume_builder/education/education_form.html'
-    success_url = reverse_lazy('education_list')
+    success_url = reverse_lazy('resume_builder_web:education_list')
 
     def form_valid(self, form):
         resume = form.cleaned_data['resume']
@@ -140,7 +147,7 @@ class EducationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Education
     form_class = EducationForm
     template_name = 'resume_builder/education/education_form.html'
-    success_url = reverse_lazy('education_list')
+    success_url = reverse_lazy('resume_builder_web:education_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -148,7 +155,7 @@ class EducationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class EducationDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Education
     template_name = 'resume_builder/education/education_confirm_delete.html'
-    success_url = reverse_lazy('education_list')
+    success_url = reverse_lazy('resume_builder_web:education_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -175,7 +182,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
     model = Project
     form_class = ProjectForm
     template_name = 'resume_builder/project/project_form.html'
-    success_url = reverse_lazy('project_list')
+    success_url = reverse_lazy('resume_builder_web:project_list')
 
     def form_valid(self, form):
         resume = form.cleaned_data['resume']
@@ -188,7 +195,7 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Project
     form_class = ProjectForm
     template_name = 'resume_builder/project/project_form.html'
-    success_url = reverse_lazy('project_list')
+    success_url = reverse_lazy('resume_builder_web:project_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -196,7 +203,7 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Project
     template_name = 'resume_builder/project/project_confirm_delete.html'
-    success_url = reverse_lazy('project_list')
+    success_url = reverse_lazy('resume_builder_web:project_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -223,7 +230,7 @@ class CertificationCreateView(LoginRequiredMixin, CreateView):
     model = Certification
     form_class = CertificationForm
     template_name = 'resume_builder/certification/certification_form.html'
-    success_url = reverse_lazy('certification_list')
+    success_url = reverse_lazy('resume_builder_web:certification_list')
 
     def form_valid(self, form):
         resume = form.cleaned_data['resume']
@@ -236,7 +243,7 @@ class CertificationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVie
     model = Certification
     form_class = CertificationForm
     template_name = 'resume_builder/certification/certification_form.html'
-    success_url = reverse_lazy('certification_list')
+    success_url = reverse_lazy('resume_builder_web:certification_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -244,7 +251,7 @@ class CertificationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVie
 class CertificationDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Certification
     template_name = 'resume_builder/certification/certification_confirm_delete.html'
-    success_url = reverse_lazy('certification_list')
+    success_url = reverse_lazy('resume_builder_web:certification_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -271,7 +278,7 @@ class AwardCreateView(LoginRequiredMixin, CreateView):
     model = Award
     form_class = AwardForm
     template_name = 'resume_builder/award/award_form.html'
-    success_url = reverse_lazy('award_list')
+    success_url = reverse_lazy('resume_builder_web:award_list')
 
     def form_valid(self, form):
         resume = form.cleaned_data['resume']
@@ -284,7 +291,7 @@ class AwardUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Award
     form_class = AwardForm
     template_name = 'resume_builder/award/award_form.html'
-    success_url = reverse_lazy('award_list')
+    success_url = reverse_lazy('resume_builder_web:award_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -292,7 +299,7 @@ class AwardUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class AwardDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Award
     template_name = 'resume_builder/award/award_confirm_delete.html'
-    success_url = reverse_lazy('award_list')
+    success_url = reverse_lazy('resume_builder_web:award_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -319,7 +326,7 @@ class LanguageCreateView(LoginRequiredMixin, CreateView):
     model = Language
     form_class = LanguageForm
     template_name = 'resume_builder/language/language_form.html'
-    success_url = reverse_lazy('language_list')
+    success_url = reverse_lazy('resume_builder_web:language_list')
 
     def form_valid(self, form):
         resume = form.cleaned_data['resume']
@@ -332,7 +339,7 @@ class LanguageUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Language
     form_class = LanguageForm
     template_name = 'resume_builder/language/language_form.html'
-    success_url = reverse_lazy('language_list')
+    success_url = reverse_lazy('resume_builder_web:language_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -340,7 +347,7 @@ class LanguageUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class LanguageDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Language
     template_name = 'resume_builder/language/language_confirm_delete.html'
-    success_url = reverse_lazy('language_list')
+    success_url = reverse_lazy('resume_builder_web:language_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -367,7 +374,7 @@ class TechnicalSkillCreateView(LoginRequiredMixin, CreateView):
     model = TechnicalSkill
     form_class = TechnicalSkillForm
     template_name = 'resume_builder/technical_skill/technical_skill_form.html'
-    success_url = reverse_lazy('technical_skill_list')
+    success_url = reverse_lazy('resume_builder_web:technical_skill_list')
 
     def form_valid(self, form):
         resume = form.cleaned_data['resume']
@@ -380,7 +387,7 @@ class TechnicalSkillUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVi
     model = TechnicalSkill
     form_class = TechnicalSkillForm
     template_name = 'resume_builder/technical_skill/technical_skill_form.html'
-    success_url = reverse_lazy('technical_skill_list')
+    success_url = reverse_lazy('resume_builder_web:technical_skill_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -388,7 +395,7 @@ class TechnicalSkillUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateVi
 class TechnicalSkillDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = TechnicalSkill
     template_name = 'resume_builder/technical_skill/technical_skill_confirm_delete.html'
-    success_url = reverse_lazy('technical_skill_list')
+    success_url = reverse_lazy('resume_builder_web:technical_skill_list')
 
     def test_func(self):
         return self.get_object().resume.user == self.request.user
@@ -458,6 +465,17 @@ class ResumeListView(LoginRequiredMixin, ListView):
         return context
 
 
+class ResumeCreateView(LoginRequiredMixin, CreateView):
+    model = Resume
+    form_class = ResumeForm
+    template_name = 'resume_builder/resume_form.html'
+    success_url = reverse_lazy('resume_builder_web:resume_list')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
 class ResumeDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Resume
     template_name = 'resume_builder/resume_detail.html'
@@ -477,7 +495,7 @@ class ResumeDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
             'educations': Education.objects.filter(resume=resume).order_by('-end_date'),
             'projects': Project.objects.filter(resume=resume).order_by('-start_date'),
             'certifications': Certification.objects.filter(resume=resume).order_by('-issue_date'),
-            'awards': Award.objects.filter(resume=resume).order_by('-date_received'),
+            'awards': Award.objects.filter(resume=resume).order_by('-issue_date'),
             'languages': Language.objects.filter(resume=resume),
             'technical_skills': TechnicalSkill.objects.filter(resume=resume),
         })
@@ -504,7 +522,7 @@ class ResumeDownloadPDFView(LoginRequiredMixin, UserPassesTestMixin, DetailView)
             'educations': Education.objects.filter(resume=resume).order_by('-end_date'),
             'projects': Project.objects.filter(resume=resume).order_by('-start_date'),
             'certifications': Certification.objects.filter(resume=resume).order_by('-issue_date'),
-            'awards': Award.objects.filter(resume=resume).order_by('-date_received'),
+            'awards': Award.objects.filter(resume=resume).order_by('-issue_date'),
             'languages': Language.objects.filter(resume=resume),
             'technical_skills': TechnicalSkill.objects.filter(resume=resume),
         }
@@ -548,7 +566,7 @@ class ResumeDownloadDOCXView(LoginRequiredMixin, UserPassesTestMixin, DetailView
         educations = Education.objects.filter(resume=resume).order_by('-end_date')
         projects = Project.objects.filter(resume=resume).order_by('-start_date')
         certifications = Certification.objects.filter(resume=resume).order_by('-issue_date')
-        awards = Award.objects.filter(resume=resume).order_by('-date_received')
+        awards = Award.objects.filter(resume=resume).order_by('-issue_date')
         languages = Language.objects.filter(resume=resume)
         technical_skills = TechnicalSkill.objects.filter(resume=resume)
         
@@ -577,7 +595,7 @@ class ResumeDownloadDOCXView(LoginRequiredMixin, UserPassesTestMixin, DetailView
             doc.add_heading('Work Experience', level=1)
             for exp in work_experiences:
                 p = doc.add_paragraph()
-                p.add_run(f'{exp.job_title} at {exp.company_name}').bold = True
+                p.add_run(f'{exp.job_title} at {exp.company}').bold = True
                 p.add_run(f' ({exp.start_date} - {exp.end_date or "Present"})')
                 doc.add_paragraph(exp.description)
         
@@ -586,8 +604,8 @@ class ResumeDownloadDOCXView(LoginRequiredMixin, UserPassesTestMixin, DetailView
             doc.add_heading('Education', level=1)
             for edu in educations:
                 p = doc.add_paragraph()
-                p.add_run(f'{edu.degree} in {edu.field_of_study}').bold = True
-                p.add_run(f' - {edu.institution_name} ({edu.start_date} - {edu.end_date or "Present"})')
+                p.add_run(f'{edu.degree} from {edu.institution}').bold = True
+                p.add_run(f' ({edu.start_date} - {edu.end_date})')
                 if edu.gpa:
                     p.add_run(f' GPA: {edu.gpa}')
         
@@ -596,8 +614,8 @@ class ResumeDownloadDOCXView(LoginRequiredMixin, UserPassesTestMixin, DetailView
             doc.add_heading('Technical Skills', level=1)
             for skill in technical_skills:
                 p = doc.add_paragraph()
-                p.add_run(f'{skill.skill_name}').bold = True
-                p.add_run(f' - {skill.proficiency_level}')
+                p.add_run(f'{skill.technology.name}').bold = True
+                p.add_run(f' - {skill.get_proficiency_display()}')
         
         # Projects
         if projects:
@@ -616,17 +634,17 @@ class ResumeDownloadDOCXView(LoginRequiredMixin, UserPassesTestMixin, DetailView
             for cert in certifications:
                 p = doc.add_paragraph()
                 p.add_run(f'{cert.name}').bold = True
-                p.add_run(f' - {cert.issuing_organization} ({cert.issue_date})')
-                if cert.expiry_date:
-                    p.add_run(f' - Expires: {cert.expiry_date}')
+                p.add_run(f' - {cert.issuer} ({cert.issue_date})')
+                if cert.expiration_date:
+                    p.add_run(f' - Expires: {cert.expiration_date}')
         
         # Awards
         if awards:
             doc.add_heading('Awards', level=1)
             for award in awards:
                 p = doc.add_paragraph()
-                p.add_run(f'{award.name}').bold = True
-                p.add_run(f' - {award.issuing_organization} ({award.date_received})')
+                p.add_run(f'{award.title}').bold = True
+                p.add_run(f' - {award.issuer} ({award.issue_date})')
                 doc.add_paragraph(award.description)
         
         # Languages
@@ -634,8 +652,8 @@ class ResumeDownloadDOCXView(LoginRequiredMixin, UserPassesTestMixin, DetailView
             doc.add_heading('Languages', level=1)
             for lang in languages:
                 p = doc.add_paragraph()
-                p.add_run(f'{lang.language_name}').bold = True
-                p.add_run(f' - {lang.proficiency_level}')
+                p.add_run(f'{lang.name}').bold = True
+                p.add_run(f' - {lang.get_proficiency_display()}')
         
         # Save to BytesIO
         buffer = BytesIO()

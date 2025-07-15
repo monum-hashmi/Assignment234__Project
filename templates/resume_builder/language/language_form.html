@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h4>{{ view.object|default:'Add' }} Work Experience</h4>
+            <h4>{{ view.object|default:'Add' }} Language</h4>
         </div>
         <div class="card-body">
             <form method="post" novalidate>
@@ -22,9 +22,9 @@
                     </div>
                 {% endfor %}
                 <button type="submit" class="btn btn-success">Save</button>
-                <a href="{% url 'resume_builder_web:work_experience_list' %}" class="btn btn-secondary">Cancel</a>
+                <a href="{% url 'resume_builder_web:language_list' %}" class="btn btn-secondary">Cancel</a>
             </form>
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %} 

@@ -2,27 +2,13 @@
 {% load static %}
 {% block content %}
 <div class="container mt-4">
-    {% if not user.resumes.exists %}
-      <div class="alert alert-warning d-flex justify-content-between align-items-center">
-        <span>You must create a resume before adding personal information.</span>
-        <a href="{% url 'resume_builder_web:resume_create' %}" class="btn btn-primary btn-sm">Create Resume</a>
-      </div>
-    {% endif %}
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h4>{{ view.object|default:'Add' }} Personal Information</h4>
+            <h4>{% if view.object %}Edit Resume{% else %}Create Resume{% endif %}</h4>
         </div>
         <div class="card-body">
             <form method="post" novalidate>
                 {% csrf_token %}
-                {% if messages %}
-                  {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                      {{ message }}
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                  {% endfor %}
-                {% endif %}
                 {{ form.non_field_errors }}
                 {% for field in form.visible_fields %}
                     <div class="mb-3">
@@ -37,7 +23,7 @@
                     </div>
                 {% endfor %}
                 <button type="submit" class="btn btn-success">Save</button>
-                <a href="{% url 'resume_builder_web:personal_information_list' %}" class="btn btn-secondary">Cancel</a>
+                <a href="{% url 'resume_builder_web:resume_list' %}" class="btn btn-secondary">Cancel</a>
             </form>
         </div>
     </div>

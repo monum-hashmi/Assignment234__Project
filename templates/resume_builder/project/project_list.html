@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3>My Projects</h3>
-        <a href="{% url 'project_create' %}" class="btn btn-primary">Add New</a>
+        <a href="{% url 'resume_builder_web:project_create' %}" class="btn btn-primary">Add New</a>
     </div>
     <div class="card shadow">
         <div class="card-body">
@@ -28,9 +28,9 @@
                         <td>{{ proj.end_date|default:"Ongoing" }}</td>
                         <td>{{ proj.is_active|yesno:"Active,Completed" }}</td>
                         <td>
-                            <a href="{% url 'project_detail' proj.pk %}" class="btn btn-sm btn-info">View</a>
-                            <a href="{% url 'project_update' proj.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                            <a href="{% url 'project_delete' proj.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                            <a href="{% url 'resume_builder_web:project_detail' proj.pk %}" class="btn btn-sm btn-info">View</a>
+                            <a href="{% url 'resume_builder_web:project_update' proj.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{% url 'resume_builder_web:project_delete' proj.pk %}" class="btn btn-sm btn-danger">Delete</a>
                         </td>
                     </tr>
                     {% empty %}
