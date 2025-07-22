@@ -112,7 +112,7 @@ class WorkExperience(models.Model):
     end_date = models.DateField(null=True, blank=True)
     is_current = models.BooleanField(default=False)
     description = models.TextField(blank=True)
-    achievements = models.JSONField(default=list, blank=True)
+    achievements = models.TextField(blank=True, null=True)
     technologies = models.ManyToManyField('Technology', related_name='experiences', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -242,7 +242,7 @@ class Project(models.Model):
     end_date = models.DateField(null=True, blank=True)
     description = models.TextField()
     technologies = models.ManyToManyField(Technology, related_name='projects', blank=True)
-    outcomes = models.JSONField(default=dict, blank=True)
+    outcomes = models.TextField(blank=True, null=True)
     url = models.URLField(blank=True)
     is_active = models.BooleanField(default=True)
 
@@ -300,7 +300,7 @@ class Award(models.Model):
         ]
     )
     description = models.TextField(blank=True)
-    impact_metrics = models.JSONField(default=dict, blank=True)
+    impact_metrics = models.TextField(blank=True, null=True)
     is_visible = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
