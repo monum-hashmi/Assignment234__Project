@@ -62,7 +62,17 @@ class ProjectForm(forms.ModelForm):
 class CertificationForm(forms.ModelForm):
     class Meta:
         model = Certification
-        fields = ['resume', 'name', 'issuer', 'issue_date', 'expiration_date', 'credential_id', 'verification_url', 'skills']
+        fields = [
+            'resume', 'name', 'issuer', 'issue_date',
+            'expiration_date', 'credential_id',
+            'verification_url', 'skills'
+        ]
+        widgets = {
+            'issue_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'expiration_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'skills': forms.SelectMultiple(attrs={'class': 'form-control'}),  # Fix for ManyToManyField
+        }
+
 
 class AwardForm(forms.ModelForm):
     class Meta:

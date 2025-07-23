@@ -128,8 +128,12 @@ class WorkExperience(models.Model):
         return f"{self.job_title} at {self.company}"
 
 
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
+
 class TechnicalSkill(models.Model):
     """Link Technology to Resume with proficiency levels"""
+
     PROGRESS_LEVELS = [
         (20, 'Basic'),
         (40, 'Beginner'),
@@ -137,20 +141,23 @@ class TechnicalSkill(models.Model):
         (80, 'Advanced'),
         (100, 'Expert'),
     ]
+
     resume = models.ForeignKey(
-        Resume,
+        'Resume',
         on_delete=models.CASCADE,
         related_name='technical_skills'
     )
-    technology = models.ForeignKey(
-        'Technology',
-        on_delete=models.CASCADE,
-        related_name='skill_entries'
+
+    # Changed from ForeignKey to CharField
+    technology = models.CharField(
+        max_length=100
     )
+
     proficiency = models.PositiveIntegerField(
         choices=PROGRESS_LEVELS,
         validators=[MinValueValidator(20), MaxValueValidator(100)]
     )
+
     years_experience = models.PositiveIntegerField(default=0)
     last_used = models.DateField(null=True, blank=True)
     project_count = models.PositiveIntegerField(default=0)
@@ -161,15 +168,15 @@ class TechnicalSkill(models.Model):
     class Meta:
         verbose_name = 'Technical Skill'
         verbose_name_plural = 'Technical Skills'
-        unique_together = ('resume', 'technology')
-        ordering = ['-proficiency', 'technology__name']
+        ordering = ['-proficiency', 'technology']
         indexes = [
             models.Index(fields=['proficiency']),
             models.Index(fields=['resume', 'technology']),
         ]
 
     def __str__(self):
-        return f"{self.technology.name} – {self.get_proficiency_display()}"
+        return f"{self.technology} – {self.get_proficiency_display()}"
+
 
 
 class Education(models.Model):
