@@ -1,5 +1,10 @@
 from django.urls import path
 
+from django.conf import settings
+from django.conf.urls.static import static
+from resume_builder.web.views import PersonalInformationCreateView
+
+
 from .views import (
     # Personal Info
     PersonalInformationListView, PersonalInformationCreateView, PersonalInformationUpdateView,
@@ -116,3 +121,6 @@ urlpatterns = [
     path('preview/technical/<int:resume_id>/', TechnicalResumePreviewView.as_view(), name='resume_preview_technical'),
     path('preview/minimal/<int:resume_id>/', MinimalResumePreviewView.as_view(), name='resume_preview_minimal'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

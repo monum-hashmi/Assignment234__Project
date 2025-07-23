@@ -12,6 +12,14 @@ from docx import Document
 from docx.shared import Inches
 from io import BytesIO
 import os
+
+from django.views.generic.edit import UpdateView
+from resume_builder.models import PersonalInformation
+from resume_builder.forms import PersonalInformationForm
+
+
+
+
 from resume_builder.models import (
     WorkExperience, Education, Project, Certification, 
     Award, Language, TechnicalSkill, PersonalInformation, Resume
@@ -57,7 +65,22 @@ class PersonalInformationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Upd
     success_url = reverse_lazy('resume_builder_web:personal_information_list')
 
     def test_func(self):
+        # Only allow access if the personal info belongs to the logged-in user
         return self.get_object().resume.user == self.request.user
+
+    def post(self, request, *args, **kwargs):
+        # Handle image upload by passing request.FILES
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        # Save the uploaded profile image and other data
+        form.save()
+        return super().form_valid(form)
 
 class PersonalInformationDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = PersonalInformation

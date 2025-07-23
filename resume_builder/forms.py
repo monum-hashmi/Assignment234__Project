@@ -26,7 +26,7 @@ class PersonalInformationForm(forms.ModelForm):
         model = PersonalInformation
         fields = [
             'first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state', 'country', 'postal_code',
-            'linkedin_url', 'github_url', 'portfolio_url',
+            'linkedin_url', 'github_url', 'portfolio_url', 'profile_image',
             'date_of_birth', 'nationality', 'is_visible'
         ]
         widgets = {
