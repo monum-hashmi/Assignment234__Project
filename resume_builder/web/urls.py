@@ -1,4 +1,5 @@
 from django.urls import path
+
 from .views import (
     PersonalInformationListView, PersonalInformationCreateView, PersonalInformationUpdateView,
     PersonalInformationDeleteView, PersonalInformationDetailView,
@@ -17,8 +18,11 @@ from .views import (
     ClassicResumePreviewView, ModernResumePreviewView, CreativeResumePreviewView, TechnicalResumePreviewView, MinimalResumePreviewView,
     ResumeListView, ResumeCreateView, ResumeDetailView, ResumeDownloadPDFView, ResumeDownloadDOCXView
 )
+from django.urls import path
+from .views import ResumeListView, ResumeDeleteView  # import your view
 
 app_name = 'resume_builder_web'
+
 
 urlpatterns = [
     # Personal Information URLs
@@ -85,6 +89,8 @@ urlpatterns = [
     path('preview/minimal/<int:resume_id>/', MinimalResumePreviewView.as_view(), name='resume_preview_minimal'),
 
     # Resume List
+    path('resume/<int:pk>/delete/', ResumeDeleteView.as_view(), name='resume_delete'),
+
     path('resume/', ResumeListView.as_view(), name='resume_list'),
     # Resume URLs
     path('resume/add/', ResumeCreateView.as_view(), name='resume_create'),

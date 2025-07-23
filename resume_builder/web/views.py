@@ -20,6 +20,8 @@ from resume_builder.forms import (
     WorkExperienceForm, EducationForm, ProjectForm, CertificationForm,
     AwardForm, LanguageForm, TechnicalSkillForm, PersonalInformationForm, ResumeForm
 )
+from django.views.generic import DeleteView
+from django.urls import reverse_lazy
 
 # Personal Information CRUD Views
 class PersonalInformationListView(LoginRequiredMixin, ListView):
@@ -463,7 +465,10 @@ class ResumeListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['user_resume'] = Resume.objects.filter(user=self.request.user).first()
         return context
-
+class ResumeDeleteView(DeleteView):
+    model = Resume
+    template_name = 'resume_confirm_delete.html'  # You can reuse an existing template or create one
+    success_url = reverse_lazy('resume_builder_web:resume_list')
 
 class ResumeCreateView(LoginRequiredMixin, CreateView):
     model = Resume
