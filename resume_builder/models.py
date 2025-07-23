@@ -44,7 +44,8 @@ class Resume(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=300, unique=True)
     summary = models.TextField(blank=True)
-    tags = models.JSONField(default=list, blank=True)
+    tags = models.TextField(null=True, blank=True)
+
     template = models.ForeignKey(
         ResumeTemplate,
         on_delete=models.SET_NULL,

@@ -22,7 +22,8 @@
                 <tbody>
                     {% for skill in technical_skills %}
                     <tr>
-                        <td>{{ skill.technology.name }}</td>
+                        <td>{{ skill.technology }}</td>
+
                         <td>{{ skill.get_proficiency_display }}</td>
                         <td>{{ skill.years_experience }}</td>
                         <td>{{ skill.last_used|default:"Not specified" }}</td>
