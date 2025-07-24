@@ -6,6 +6,30 @@ Dashboard - Resume Builder
 {% endblock %}
 
 {% block content %}
+  {% if request.user.is_authenticated %}
+  {% with email_obj=request.user.emailaddress_set.first %}
+    {% if email_obj and not email_obj.verified %}
+      <div class="alert alert-warning d-flex align-items-center mt-3 justify-content-between" role="alert">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Your email is&nbsp;<strong>not verified</strong>.
+        </div>
+        <form method="post" action="{% url 'account_email' %}">
+          {% csrf_token %}
+          <button type="submit" name="action_send" class="btn btn-warning btn-sm fw-bold">
+            Verify Email
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <div class="alert alert-success d-flex align-items-center mt-3" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        Your email is&nbsp;<strong>verified</strong>.
+      </div>
+    {% endif %}
+  {% endwith %}
+{% endif %}
+
 <div class="container-fluid">
     <!-- Page Title -->
     <div class="pagetitle">
@@ -17,7 +41,6 @@ Dashboard - Resume Builder
             </ol>
         </nav>
     </div>
-
     <!-- Welcome Section -->
     <div class="row">
         <div class="col-lg-8">
@@ -95,6 +118,15 @@ Dashboard - Resume Builder
 
     <!-- Quick Stats -->
     <div class="row">
+        {% if not request.user.emailaddress_set.first.verified %}
+          <div class="col-md-3 mb-3">
+                 <a href="{% url 'account_email' %}" class="btn btn-outline-warning w-100">
+                     <i class="bi bi-envelope-exclamation"></i><br>
+                     Verify Email
+                 </a>
+          </div>
+        {% endif %}
+
         <div class="col-lg-3 col-md-6">
             <div class="card info-card sales-card">
                 <div class="card-body">
