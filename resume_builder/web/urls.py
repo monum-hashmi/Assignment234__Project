@@ -3,6 +3,12 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from resume_builder.web.views import PersonalInformationCreateView
+from .views import ResumeDynamicPreviewView
+
+from . import views
+from resume_builder.web.views import ResumePreviewView
+
+
 
 
 from .views import (
@@ -43,8 +49,7 @@ from .views import (
     ResumeDownloadPDFView, ResumeDownloadDOCXView,
 
     # Previews
-    ClassicResumePreviewView, ModernResumePreviewView, CreativeResumePreviewView,
-    TechnicalResumePreviewView, MinimalResumePreviewView,
+
 )
 
 app_name = 'resume_builder_web'
@@ -114,12 +119,17 @@ urlpatterns = [
     path('resume/<int:pk>/download/pdf/', ResumeDownloadPDFView.as_view(), name='resume_download_pdf'),
     path('resume/<int:pk>/download/docx/', ResumeDownloadDOCXView.as_view(), name='resume_download_docx'),
 
-    # Resume Previews
-    path('preview/classic/<int:resume_id>/', ClassicResumePreviewView.as_view(), name='resume_preview_classic'),
-    path('preview/modern/<int:resume_id>/', ModernResumePreviewView.as_view(), name='resume_preview_modern'),
-    path('preview/creative/<int:resume_id>/', CreativeResumePreviewView.as_view(), name='resume_preview_creative'),
-    path('preview/technical/<int:resume_id>/', TechnicalResumePreviewView.as_view(), name='resume_preview_technical'),
-    path('preview/minimal/<int:resume_id>/', MinimalResumePreviewView.as_view(), name='resume_preview_minimal'),
+    # Resume Previews (recommended: use dynamic one)
+
+
+    path('resume/preview/<slug:slug>/<int:resume_id>/', ResumePreviewView.as_view(), name='resume_template_preview'),
+
+
+
+path('resume/<int:resume_id>/preview/<slug:template_slug>/', ResumePreviewView.as_view(), name='resume_preview'),
+
+path('resume/<int:resume_id>/preview/<slug:template_slug>/', views.ResumePreviewView.as_view(), name='resume_preview'),
+
 ]
 
 if settings.DEBUG:

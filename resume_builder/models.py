@@ -4,24 +4,39 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 
+
+
+# resume_builder/web/models.py
+from django.db import models
+from django.utils.text import slugify
+
+
+
 # -----------------------------
 # Resume Builder Models
 # -----------------------------
 class ResumeTemplate(models.Model):
     """Template with versioning, configuration and format type"""
     TEMPLATE_FORMATS = [
-        ('CLASSIC', 'Classic'),
-        ('MODERN', 'Modern'),
-        ('CREATIVE', 'Creative'),
-        ('TECHNICAL', 'Technical'),
+        ('classic', 'Classic'),
+        ('creative', 'Creative'),
+        ('minimal', 'Minimal'),
+        ('modern', 'Modern'),
+        ('technical', 'Technical'),
     ]
     name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True)
+
     description = models.TextField(blank=True)
     format_type = models.CharField(max_length=20, choices=TEMPLATE_FORMATS)
     thumbnail = models.ImageField(upload_to='resume_templates/', blank=True)
     config = models.JSONField(default=dict, blank=True)
     version = models.PositiveIntegerField(default=1)
     is_active = models.BooleanField(default=True)
+    file_name = models.CharField(
+        max_length=255,
+        default='resume_builder/preview/template_classic.html'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -87,7 +102,7 @@ class ResumeSection(models.Model):
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='sections')
     section_type = models.CharField(max_length=20, choices=SECTION_TYPES)
     title = models.CharField(max_length=100)
-    content = models.JSONField(default=dict, blank=True)
+    content = models.TextField(default="", blank=True)
     order = models.PositiveIntegerField(default=0)
     is_visible = models.BooleanField(default=True)
 

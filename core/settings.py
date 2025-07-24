@@ -241,10 +241,10 @@ ACCOUNT_FORMS = {
 ACCOUNT_CHANGE_PASSWORD_REDIRECT_URL = '/dashboard/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_HOST = env('EMAIL_HOST', default='localhost')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-EMAIL_PORT = env.int('EMAIL_PORT')
+EMAIL_PORT = env('EMAIL_PORT', default=25)
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=False)
 EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
 

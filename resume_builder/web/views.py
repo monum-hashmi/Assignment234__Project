@@ -4,6 +4,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, TemplateView
 from django.shortcuts import get_object_or_404
+from django.views import View
+
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
@@ -12,11 +14,14 @@ from docx import Document
 from docx.shared import Inches
 from io import BytesIO
 import os
+from django.shortcuts import render, get_object_or_404
+from resume_builder.models import Resume
 
 from django.views.generic.edit import UpdateView
 from resume_builder.models import PersonalInformation
 from resume_builder.forms import PersonalInformationForm
 
+from django.db import models
 
 
 
@@ -30,6 +35,10 @@ from resume_builder.forms import (
 )
 from django.views.generic import DeleteView
 from django.urls import reverse_lazy
+
+# resume_builder/web/views.py
+from resume_builder.models import ResumeTemplate
+
 
 # Personal Information CRUD Views
 class PersonalInformationListView(LoginRequiredMixin, ListView):
@@ -434,18 +443,28 @@ class TechnicalSkillDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailVi
         return self.get_object().resume.user == self.request.user
 
 
-# Resume Preview Views
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
+from resume_builder.models import Resume
+
 class ResumePreviewView(LoginRequiredMixin, TemplateView):
-    """Base class for resume preview views"""
-    
+    """Dynamically render resume based on selected template"""
+
+    def get_template_names(self):
+        resume_id = self.kwargs.get('resume_id')
+        resume = get_object_or_404(Resume, id=resume_id, user=self.request.user)
+
+        template_slug = resume.template.slug  # e.g., 'classic', 'modern'
+        return [f'resume_builder/preview/template_{template_slug}.html']
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         resume_id = self.kwargs.get('resume_id')
         resume = get_object_or_404(Resume, id=resume_id, user=self.request.user)
-        
-        # Get all resume data
+
         context['resume'] = resume
-        context['personal_info'] = resume.personal_information.first()  # Get personal information
+        context['personal_info'] = resume.personal_information.first()
         context['work_experiences'] = resume.work_experiences.all()
         context['educations'] = resume.educations.all()
         context['projects'] = resume.projects.all()
@@ -456,24 +475,24 @@ class ResumePreviewView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class ClassicResumePreviewView(ResumePreviewView):
-    template_name = 'resume_builder/preview/template_classic.html'
+#class ClassicResumePreviewView(ResumePreviewView):
+ #   template_name = 'resume_builder/preview/template_classic.html'
 
 
-class ModernResumePreviewView(ResumePreviewView):
-    template_name = 'resume_builder/preview/template_modern.html'
+#class ModernResumePreviewView(ResumePreviewView):
+ #   template_name = 'resume_builder/preview/template_modern.html'
 
 
-class CreativeResumePreviewView(ResumePreviewView):
-    template_name = 'resume_builder/preview/template_creative.html'
+#class CreativeResumePreviewView(ResumePreviewView):
+ #   template_name = 'resume_builder/preview/template_creative.html'
 
 
-class TechnicalResumePreviewView(ResumePreviewView):
-    template_name = 'resume_builder/preview/template_technical.html'
+#class TechnicalResumePreviewView(ResumePreviewView):
+#    template_name = 'resume_builder/preview/template_technical.html'
 
 
-class MinimalResumePreviewView(ResumePreviewView):
-    template_name = 'resume_builder/preview/template_minimal.html'
+#class MinimalResumePreviewView(ResumePreviewView):
+#    template_name = 'resume_builder/preview/template_minimal.html'
 
 
 class ResumeListView(LoginRequiredMixin, ListView):
@@ -492,6 +511,28 @@ class ResumeDeleteView(DeleteView):
     model = Resume
     template_name = 'resume_confirm_delete.html'  # You can reuse an existing template or create one
     success_url = reverse_lazy('resume_builder_web:resume_list')
+
+class ResumeDynamicPreviewView(LoginRequiredMixin, View):
+    def get(self, request, resume_id):
+        resume = get_object_or_404(Resume, id=resume_id, user=request.user)
+
+        context = {
+            'resume': resume,
+            'personal_info': PersonalInformation.objects.filter(resume=resume).first(),
+            'work_experiences': WorkExperience.objects.filter(resume=resume).order_by('-end_date'),
+            'educations': Education.objects.filter(resume=resume).order_by('-end_date'),
+            'projects': Project.objects.filter(resume=resume).order_by('-start_date'),
+            'certifications': Certification.objects.filter(resume=resume).order_by('-issue_date'),
+            'awards': Award.objects.filter(resume=resume).order_by('-issue_date'),
+            'languages': Language.objects.filter(resume=resume),
+            'technical_skills': TechnicalSkill.objects.filter(resume=resume),
+        }
+
+        template_path = resume.template.file_name  # this contains the full path like 'resume_builder/preview/template_modern.html'
+        return render(request, f'resume_builder/preview/{selected_template}.html', context)
+
+
+
 
 class ResumeCreateView(LoginRequiredMixin, CreateView):
     model = Resume
