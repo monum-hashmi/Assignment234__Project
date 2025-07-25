@@ -48,6 +48,7 @@ class ResumeTemplate(models.Model):
         return f"{self.name} (v{self.version})"
 
 
+
 class Resume(models.Model):
     """Central resume model with slug, tags, language and visibility"""
     user = models.ForeignKey(

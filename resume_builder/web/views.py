@@ -8,7 +8,7 @@ from django.views import View
 
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.shortcuts import get_object_or_404
+
 from xhtml2pdf import pisa
 from docx import Document
 from docx.shared import Inches
@@ -22,6 +22,14 @@ from resume_builder.models import PersonalInformation
 from resume_builder.forms import PersonalInformationForm
 
 from django.db import models
+
+
+from django.template import TemplateDoesNotExist
+
+
+
+
+from django.views.generic.detail import DetailView
 
 
 
@@ -586,7 +594,6 @@ class ResumeDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
 class ResumeDownloadPDFView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Resume
-    template_name = 'resume_builder/resume_pdf_template.html'
     context_object_name = 'resume'
 
     def test_func(self):
@@ -594,8 +601,15 @@ class ResumeDownloadPDFView(LoginRequiredMixin, UserPassesTestMixin, DetailView)
 
     def get(self, request, *args, **kwargs):
         resume = self.get_object()
-        
-        # Get all resume data
+
+        # Fallback if template is not set
+        if not resume.template or not resume.template.file_name:
+            return HttpResponse("No template assigned to this resume.", status=400)
+
+        # Get full template path
+        template_path = resume.template.file_name  # e.g. 'resume_builder/preview/template_classic.html'
+
+        # Build context
         context = {
             'resume': resume,
             'personal_info': PersonalInformation.objects.filter(resume=resume).first(),
@@ -607,22 +621,24 @@ class ResumeDownloadPDFView(LoginRequiredMixin, UserPassesTestMixin, DetailView)
             'languages': Language.objects.filter(resume=resume),
             'technical_skills': TechnicalSkill.objects.filter(resume=resume),
         }
-        
-        # Render the template
-        html_string = render_to_string(self.template_name, context)
-        
-        # Create PDF
+
+        # Render HTML
+        try:
+            html_string = render_to_string(template_path, context)
+        except TemplateDoesNotExist:
+            return HttpResponse(f"Template file '{template_path}' not found.", status=404)
+
+        # Create PDF response
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{resume.title}_resume.pdf"'
-        
-        # Generate PDF
-        pisa_status = pisa.CreatePDF(html_string, dest=response)
-        
-        if pisa_status.err:
-            return HttpResponse('PDF generation failed', status=500)
-        
-        return response
 
+        # Generate PDF with xhtml2pdf
+        pisa_status = pisa.CreatePDF(html_string, dest=response)
+
+        if pisa_status.err:
+            return HttpResponse('PDF generation failed.', status=500)
+
+        return response
 
 class ResumeDownloadDOCXView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Resume
