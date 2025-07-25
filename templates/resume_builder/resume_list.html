@@ -59,11 +59,21 @@ My Resumes - Resume Builder
                                                     <a href="{% url 'resume_builder_web:resume_download_docx' resume.pk %}" class="btn btn-success btn-sm">
                                                         <i class="bi bi-file-word"></i> DOCX
                                                     </a>
-                                                    {% if resume.template and resume.template.slug %}
-                                                    <a href="{% url 'resume_builder_web:resume_preview' template_slug=resume.template.slug resume_id=resume.pk %}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                                                        <i class="bi bi-display"></i> Preview
-                                                    </a>
-                                                    {% endif %}
+                                                    <form method="post" action="{% url 'resume_builder_web:select_template' %}" class="d-flex align-items-center gap-2">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="resume_id" value="{{ resume.pk }}">
+                                                        <select name="template" class="form-select form-select-sm" style="width: auto;">
+                                                            <option value="classic">Classic</option>
+                                                            <option value="creative">Creative</option>
+                                                            <option value="minimal">Minimal</option>
+                                                            <option value="modern">Modern</option>
+                                                            <option value="technical">Technical</option>
+                                                        </select>
+                                                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                                            <i class="bi bi-display"></i> Preview
+                                                        </button>
+                                                    </form>
+
                                                     <form method="post" action="{% url 'resume_builder_web:resume_delete' resume.pk %}" style="display:inline;">
                                                         {% csrf_token %}
                                                         <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this resume?');">

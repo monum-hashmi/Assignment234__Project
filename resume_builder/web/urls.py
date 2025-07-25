@@ -7,7 +7,7 @@ from .views import ResumeDynamicPreviewView
 
 from . import views
 from resume_builder.web.views import ResumePreviewView
-
+from .views import select_template_view
 
 
 
@@ -122,14 +122,14 @@ urlpatterns = [
     # Resume Previews (recommended: use dynamic one)
 
 
-    path('resume/preview/<slug:slug>/<int:resume_id>/', ResumePreviewView.as_view(), name='resume_template_preview'),
+    # Option A: session-based preview (after user selects a template)
+    path('resume/preview/<int:resume_id>/', ResumePreviewView.as_view(), name='resume_preview'),
 
+    # Option B: URL-based preview (e.g., /resume/23/preview/modern/)
+    path('resume/<int:resume_id>/preview/<str:template_slug>/', ResumeDynamicPreviewView.as_view(), name='resume_dynamic_preview'),
 
-
-path('resume/<int:resume_id>/preview/<slug:template_slug>/', ResumePreviewView.as_view(), name='resume_preview'),
-
-path('resume/<int:resume_id>/preview/<slug:template_slug>/', views.ResumePreviewView.as_view(), name='resume_preview'),
-
+    # View to save selected template in session
+    path('select-template/', select_template_view, name='select_template'),
 ]
 
 if settings.DEBUG:

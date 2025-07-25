@@ -40,6 +40,22 @@ from django.urls import reverse_lazy
 from resume_builder.models import ResumeTemplate
 
 
+# resume_builder/web/views.py
+
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def select_template_view(request):
+    if request.method == 'POST':
+        selected_template = request.POST.get('template')
+        resume_id = request.POST.get('resume_id')
+        print("Selected Template:", selected_template)  # ← Add this line
+        request.session['selected_template'] = selected_template
+        return redirect('resume_builder_web:resume_preview', resume_id=resume_id)
+    return redirect('resume_builder_web:resume_list')
+
+
 # Personal Information CRUD Views
 class PersonalInformationListView(LoginRequiredMixin, ListView):
     model = PersonalInformation
@@ -78,18 +94,18 @@ class PersonalInformationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Upd
         return self.get_object().resume.user == self.request.user
 
     def post(self, request, *args, **kwargs):
-        # Handle image upload by passing request.FILES
         self.object = self.get_object()
-        form = self.get_form()
+        form = self.get_form(self.get_form_class())  # get the form class
+        form = self.form_class(request.POST, request.FILES, instance=self.object)  # pass request.FILES
         if form.is_valid():
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        # Save the uploaded profile image and other data
-        form.save()
+        print("✔️ Image file uploaded:", self.request.FILES.get('profile_image'))
         return super().form_valid(form)
+
 
 class PersonalInformationDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = PersonalInformation
@@ -452,10 +468,7 @@ class ResumePreviewView(LoginRequiredMixin, TemplateView):
     """Dynamically render resume based on selected template"""
 
     def get_template_names(self):
-        resume_id = self.kwargs.get('resume_id')
-        resume = get_object_or_404(Resume, id=resume_id, user=self.request.user)
-
-        template_slug = resume.template.slug  # e.g., 'classic', 'modern'
+        template_slug = self.request.session.get('selected_template', 'classic')
         return [f'resume_builder/preview/template_{template_slug}.html']
 
     def get_context_data(self, **kwargs):
@@ -529,9 +542,8 @@ class ResumeDynamicPreviewView(LoginRequiredMixin, View):
         }
 
         template_path = resume.template.file_name  # this contains the full path like 'resume_builder/preview/template_modern.html'
-        return render(request, f'resume_builder/preview/{selected_template}.html', context)
-
-
+        template_slug = request.session.get('selected_template', 'classic')
+        return render(request, f'resume_builder/preview/template_{template_slug}.html', context)
 
 
 class ResumeCreateView(LoginRequiredMixin, CreateView):
