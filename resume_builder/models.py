@@ -134,6 +134,14 @@ class WorkExperience(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
+
+    def achievement_list(self):
+        """Returns the achievements as a clean list"""
+        if not self.achievements:
+            return []
+        return [item.strip().capitalize() for item in self.achievements.split(',') if item.strip()]
+
     class Meta:
         ordering = ['-start_date']
         indexes = [

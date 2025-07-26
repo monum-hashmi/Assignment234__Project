@@ -1,8 +1,4 @@
-{% extends 'resume_base.html' %}
 
-{% block title %}Minimal Resume - {{ personal_info.full_name|default:"Your Name" }}{% endblock %}
-
-{% block content %}
 <div class="resume-container minimal-template">
     {% if personal_info %}
     <div class="resume-header">
@@ -70,10 +66,10 @@
                     {% if experience.description %}
                     <div class="job-description">{{ experience.description }}</div>
                     {% endif %}
-                    {% if experience.achievements %}
+                    {% if experience.achievement_list %}
                     <ul class="achievements-list">
-                        {% for achievement in experience.achievements %}
-                        <li>{{ achievement }}</li>
+                        {% for achievement in experience.achievement_list %}
+                        <li>🏆 {{ achievement }}</li>
                         {% endfor %}
                     </ul>
                     {% endif %}
@@ -465,4 +461,3 @@
     }
 }
 </style>
-{% endblock %} 

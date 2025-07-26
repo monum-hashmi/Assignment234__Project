@@ -711,7 +711,8 @@ class ResumeDownloadDOCXView(LoginRequiredMixin, UserPassesTestMixin, DetailView
             doc.add_heading('Technical Skills', level=1)
             for skill in technical_skills:
                 p = doc.add_paragraph()
-                p.add_run(f'{skill.technology.name}').bold = True
+                p.add_run(f'{skill.technology}').bold = True
+
                 p.add_run(f' - {skill.get_proficiency_display()}')
         
         # Projects
